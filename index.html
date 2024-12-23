@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web App</title>
+</head>
+<body>
+    <div id="app">
+        <h1>Welcome to the Web App</h1>
+        <div id="registration" style="display: none;">
+            <h2>Register</h2>
+            <input type="text" id="id" placeholder="ID" required>
+            <input type="text" id="name" placeholder="Name" required>
+            <input type="text" id="lastName" placeholder="Last Name" required>
+            <button onclick="register()">Register</button>
+        </div>
+        <div id="welcome" style="display: none;">
+            <h2>Welcome, <span id="userName"></span>!</h2>
+        </div>
+    </div>
+
+    <script>
+        async function checkLogin() {
+            const response = await fetch('/login');
+            const data = await response.json();
+            if (data.loggedIn) {
+                document.getElementById('welcome').style.display = 'block';
+                document.getElementById('userName').innerText = data.user.name;
+            } else {
+                document.getElementById('registration').style.display = 'block';
+            }
+        }
+
+        async function register() {
+            const id = document.getElementById('id').value;
+            const name = document.getElementById('name').value;
+            const lastName = document.getElementById('lastName').value;
+
+            const response = await fetch('/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id, name, lastName })
+            });
+
+            const data = await response.json();
+            alert(data.message);
+            if (response.ok) {
+                checkLogin(); // Check login status after registration
+            }
+        }
+
+        // Check login status on page load
+        window.onload = checkLogin;
+    </script>
+</body>
+</html>
